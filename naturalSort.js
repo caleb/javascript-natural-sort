@@ -2,13 +2,20 @@
  * Natural Sort algorithm for Javascript - Version 0.7 - Released under MIT license
  * Author: Jim Palmer (based on chunking idea from Dave Koelle)
  */
- function naturalSort (a, b) {
+function naturalSorter(valueFunction, insensitive) {
+  return function naturalSort(a, b) {
     var re = /(^-?[0-9]+(\.?[0-9]*)[df]?e?[0-9]?$|^0x[0-9a-f]+$|[0-9]+)/gi,
         sre = /(^[ ]*|[ ]*$)/g,
         dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/,
         hre = /^0x[0-9a-f]+$/i,
-        ore = /^0/,
-        i = function(s) { return naturalSort.insensitive && (''+s).toLowerCase() || ''+s },
+        ore = /^0/;
+
+    var i = function(s) {
+          if (valueFunction) {
+            s = valueFunction(s)
+          }
+          return insensitive && (''+s).toLowerCase() || ''+s
+        },
         // convert all to strings strip whitespace
         x = i(a).replace(sre, '') || '',
         y = i(b).replace(sre, '') || '',
@@ -19,6 +26,9 @@
         xD = parseInt(x.match(hre)) || (xN.length != 1 && x.match(dre) && Date.parse(x)),
         yD = parseInt(y.match(hre)) || xD && y.match(dre) && Date.parse(y) || null,
         oFxNcL, oFyNcL;
+
+
+
     // first try and sort Hex codes or Dates
     if (yD)
         if ( xD < yD ) return -1;
@@ -39,4 +49,5 @@
         if (oFxNcL > oFyNcL) return 1;
     }
     return 0;
+  }
 }
